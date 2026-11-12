@@ -2,6 +2,12 @@
 
 One entry per production deploy. Tokens stripped; sites are public.
 
+## 2026-11-11 - bhglow1 (bryanhamilton.info)
+- Change: `/stats.php` glow-up - neon pulse on the cockpit title, bars grow from 0 with a cyan sheen sweep, PARSED LINES + TODAY count up from zero, cards and rows lift on hover
+- Risk: appended block must not touch the log-parsing PHP - shipped as one needle inject (`</body>`, count 1), pure CSS/JS, `prefers-reduced-motion` renders it all static
+- Verify: Playwright on live page - count-ups landed exactly (37,729 / 275), zero JS errors; 8,650 -> 12,393 bytes
+- Tag: `.bak-bhglow1.bak`
+
 ## 2026-11-11 - bhdeploylog1 (bryanhamilton.info)
 - Change: LED Bay gained a "Recent deploys" strip that reads LOG.md straight from raw.githubusercontent - the site now shows what this log shows, auto-updated per commit
 - Risk: injected script reaching into the rack IIFE fails silently - block shipped fully self-contained (own fetch, own render, own cleanup); parser dry-ran against the real LOG.md before shipping
