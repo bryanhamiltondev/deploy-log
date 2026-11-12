@@ -2,6 +2,12 @@
 
 One entry per production deploy. Tokens stripped; sites are public.
 
+## 2026-11-11 - bhdeploylog1 (bryanhamilton.info)
+- Change: LED Bay gained a "Recent deploys" strip that reads LOG.md straight from raw.githubusercontent - the site now shows what this log shows, auto-updated per commit
+- Risk: injected script reaching into the rack IIFE fails silently - block shipped fully self-contained (own fetch, own render, own cleanup); parser dry-ran against the real LOG.md before shipping
+- Verify: cache-busted served HTML shows #bh-deploys + #bh-deploy-list; 307,106 -> 310,085 bytes
+- Tag: `.bak-deploylog1.bak`
+
 ## 2026-11-11 - bhstats1 (bryanhamilton.info)
 - Change: `/stats.php` cockpit dashboard - parses gzipped cPanel access logs, 10-min JSON cache, no third-party analytics
 - Risk: `filesize()` on `.gz` returns the COMPRESSED size - slicing the decompressed buffer by it silently chops the freshest log lines (13-line loss, zero warnings)
