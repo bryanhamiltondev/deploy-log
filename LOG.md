@@ -2,6 +2,30 @@
 
 One entry per production deploy. Tokens stripped; sites are public.
 
+## 2026-11-14 - bhclive1 (bryanhamilton.info)
+- Change: Coder Legion medal dots went LIVE - new same-origin endpoint `bh-cl-live.php` (server-side fetch of the CL badges page, tier counts sit in `id="hmb-Gold/Silver/Bronze" data-all="N"`, 60-min cache, stale-serve fallback) plus an injected fetch block that updates the `.cl-num-*` count-ups and the `.cl-medals` aria-label on load. Medals auto-sync now; no more hand patches when a badge lands
+- Risk: fragile profile scraping - avoided by keying the parser on the machine-readable `data-all` attributes, never on layout
+- Verify: endpoint returns `{"gold":1,"silver":3,"bronze":27}` live; served HTML carries the injected block
+- Tag: `.bak-bhclive1.bak`
+
+## 2026-11-14 - bhwplate2 + bhwplate3 (bryanhamilton.info)
+- Change: writing-article plates tightened (margin `0 0 18px` -> `-8px 0 8px`, scoped to each article's own style block) - then removed entirely hours later: style block + plate div cut from all 21 articles, zero residue, headline intact. Full ship-tweak-delete cycle inside one day
+- Risk: multi-file sweeps - every file guarded individually (exact-once style marker, plate div adjacent to style close, residue abort, h1 check) with per-file skip reporting so one odd file cannot block or corrupt the rest
+- Verify: served articles grep zero `bh-wrtplate`, headlines render; CSS recoverable from baks if the plate ever returns
+- Tag: `.bak-bhwplate2.bak` / `.bak-bhwplate3.bak` x21 each
+
+## 2026-11-14 - bhpulseoff1 (bryanhamilton.info)
+- Change: Site Pulse VU meter removed from the rack - the 2,519-byte self-contained IIFE cut between exact comment markers, nothing else touched; `pulse.php` now has zero callers
+- Risk: global first-match replace was UNSAFE here (the file holds other `right` declarations) - the cut is marker-anchored (start marker + next module's comment, each count==1) with brace-delta reconciliation before write and residue checks after
+- Verify: served rack.js 45,802 bytes with zero bhpulse1/bh-vu/pulse.php residue; rack.js v40 in both HTML refs
+- Tag: `.bak-bhpulseoff1.bak` x3
+
+## 2026-11-14 - bheggchip3 (bryanhamilton.info)
+- Change: golden-egg chip moved - `right:18px` -> `100px` in the chip's injected CSS inside rack.js, version bumped v38->v39 in both HTML files
+- Risk: rack.js lives at `assets/js/`, not the web root (a root-path dry run DRY-FAILed and a recursive locator probe found the real path); the replace is window-scoped to 500 chars after a `bhegg-chip` reference so unrelated `right:18px` declarations survive
+- Verify: served rack.js carries `right:100px;bottom:56px`, `right:18px` remaining=0, v39 refs live
+- Tag: `.bak-bheggchip3.bak` x3
+
 ## 2026-11-11 - bhglow1 (bryanhamilton.info)
 - Change: `/stats.php` glow-up - neon pulse on the cockpit title, bars grow from 0 with a cyan sheen sweep, PARSED LINES + TODAY count up from zero, cards and rows lift on hover
 - Risk: appended block must not touch the log-parsing PHP - shipped as one needle inject (`</body>`, count 1), pure CSS/JS, `prefers-reduced-motion` renders it all static
