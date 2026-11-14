@@ -2,6 +2,42 @@
 
 One entry per production deploy. Tokens stripped; sites are public.
 
+## 2026-11-14 - bhhboot1 + bhhupd1 (bryanhamilton.info)
+- Change: boot terminal line "mounting 15 projects" -> 17; hero count-up line "updating now" -> "updated now". Both one-needle index.html patches
+- Risk: count strings hide in many spots (boot lines array, hero line, JSON-LD, FAQ x3, llms/ai.txt) - each found on live served source, never from browser DOM
+- Verify: cache-busted served HTML carries both strings; workers self-deleted
+- Tag: `.bak-bhhboot1.bak` / `.bak-bhhupd1.bak` (self-cleaned)
+
+## 2026-11-14 - djctop10w + djctop10v2 (thedjcalendar.com)
+- Change: new `/top10.php` - slim CORS JSON (top-10, ~2KB vs 1.3MB djs.json), `Access-Control-Allow-Origin: *`, 30-min cache. v2 fixed an off-by-one: `djs` must stay a 1-based OBJECT (items[0] is the label) - v1's `array_values()` re-indexed to 0-based and every marquee hover pointed one artist off
+- Risk: replacing a feed endpoint without byte-replicating the original's JSON key shape - PHP json_encode turns [1..10]-keyed arrays into objects and 0-based into lists, and consumers index accordingly
+- Verify: live endpoint 200 with CORS header; alignment check djs[i].name in items[i] for all 1..10
+- Tag: none (new file + in-place rewrite, lint-gated)
+
+## 2026-11-14 - bhtkfall1 + bhhchip2 (bryanhamilton.info)
+- Change: THE CLOUDFLARE BLOCK. CF on thedjcalendar.com 403-challenges ALL server-side fetches from the BH host: streams, php-curl, AND shell curl all get the block page. Server-to-server BH->DJC is dead. Fix: browser-direct - rack.js v42 falls back to thedjcalendar.com/top10.php (CORS) when ticker.php serves empty djs; hero chip inline script fetches the same endpoint when bh-live-data.php returns zeros
+- Risk: shipping a fix that still depends on server-side fetch would have been dead on arrival - a read-only 3-transport probe worker on the real host settled it first
+- Verify: rack.js v42 live-verified, top10.php fallback chain checked end-to-end, probe self-deleted
+- Tag: `.bak-bhtkfall1.bak` / `.bak-bhhchip2.bak` (self-cleaned)
+
+## 2026-11-14 - bheggclose1 (bryanhamilton.info)
+- Change: golden-egg modal close (X and backdrop) now removes the #bhegg-chip and sets a localStorage guard so it never re-appears; rack.js v40->41
+- Risk: two close paths with slightly different code - prefix-free needle patch applied to both, verified count==2
+- Verify: served rack.js carries the guard in both handlers; version bump live
+- Tag: `.bak-bheggclose1.bak` x2 (self-cleaned)
+
+## 2026-11-14 - bhrkonair (bryanhamilton.info)
+- Change: ON AIR lamp (rk-onair span + red dot) removed from the chat header - the green avatar dot already says online. Span-only removal; rack.js already null-guards the lamp, commit fetch stays alive (serial popovers use it)
+- Risk: yanking the span could null-ref the pulse block - checked the guard before shipping
+- Verify: served header HTML zero rk-onair residue
+- Tag: `.bak-bhrkonair.bak` (self-cleaned)
+
+## 2026-11-14 - bhrack17 (bryanhamilton.info)
+- Change: rack card #16 badge-proxy (inside the expander, "Show 9 more projects"), repo counts 15->17 across 11 needles (copy, FAQ x3, meta list, JSON-LD numberOfItems + ListItem 16 + dateModified), scoreboard copy "grades land Dec 1" -> "Feb 1, 2027", llms/ai.txt +3 entries (arcade, one-file-analytics, badge-proxy)
+- Risk: v1 worker FATAL 500 on the server - the emitter doubled a `);` and it shipped without a real lint (sandbox had no PHP). v2: PHP CLI installed in sandbox (`sudo apt-get install -y php-cli`), php -l + full dress rehearsal before handoff. Standing rule now: EVERY worker gets php -l
+- Verify: 14/14 cache-busted checks PASS; worker self-deleted, baks cleaned
+- Tag: `.bak-bhrack17.bak` (self-cleaned)
+
 ## 2026-11-14 - bhclive1 (bryanhamilton.info)
 - Change: Coder Legion medal dots went LIVE - new same-origin endpoint `bh-cl-live.php` (server-side fetch of the CL badges page, tier counts sit in `id="hmb-Gold/Silver/Bronze" data-all="N"`, 60-min cache, stale-serve fallback) plus an injected fetch block that updates the `.cl-num-*` count-ups and the `.cl-medals` aria-label on load. Medals auto-sync now; no more hand patches when a badge lands
 - Risk: fragile profile scraping - avoided by keying the parser on the machine-readable `data-all` attributes, never on layout
