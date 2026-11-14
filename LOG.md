@@ -2,6 +2,12 @@
 
 One entry per production deploy. Tokens stripped; sites are public.
 
+## 2026-11-14 - djcsbui0 + djcsbui1 (thedjcalendar.com)
+- Change: prediction-scoreboard UI upgrade. A read-only probe dumped the 13,199-byte source first (never patch what you haven't seen); then a 5-needle worker added: FAQPage JSON-LD (3 questions - grading cadence, hit definition, misses are public), a countdown chip ("FIRST GRADES LAND FEB 1, 2027 - IN N DAYS", PHP-computed, self-retires the moment gradedN > 0), a "The road ahead" month-arc visualization (pending predictions grouped by month, count + avg confidence + opacity-scaled bars, ksort'd Jan 2027 -> Apr 2028), and band-colored confidence pills (vhigh/high/med/low) on all 61 pending rows
+- Risk: rehearsal on a sqlite stand-in (apt php-sqlite3) caught three of MY bugs before the server saw any of them: the patch-marker verify failed because no patch introduced the marker; `$g['conf']` inside a double-quoted PHP string interpolated fatally; and a literal backslash-n inside the injected CSS string killed the `.arc` flex rule silently (computed display stayed block). All fixed pre-handoff; final sim rendered the flex arc, chip (ceil for calendar days), and 12 seeded pills with zero PHP warnings
+- Verify: server run matched sim byte-for-byte (16,587); cache-busted live page: 1 FAQPage LD block / 3 entities parses, chip IN 79 DAYS, arc CSS + section, 61 pills; worker + probe self-deleted (404). DJC 403s the whole .bak extension pattern server-wide - a 403 there is a security rule, not a leak
+- Tag: `.bak-djcsbui1.bak` (self-cleaned)
+
 ## 2026-11-14 - bhrack18 (bryanhamilton.info)
 - Change: repo #18 browser-direct-feed published (fc6b96b) + rack card #17 inside the expander ("Show 9 more projects" -> "Show 10 more projects"); counts 17->18 across 15 needles (copy, FAQ x3, "published..." lines x3, meta list, units readout, boot line, JSON-LD numberOfItems + ListItem 17, llms/ai.txt +1 entry each). Rack columns now even at 18
 - Risk: the JSON-LD ItemList runs 17 repo entries under numberOfItems 18 BY DESIGN - the rack's the-dj-calendar site card is a product, not SoftwareSourceCode, so it is excluded. Do not "fix" this mismatch
