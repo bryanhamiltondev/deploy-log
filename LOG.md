@@ -2,6 +2,12 @@
 
 One entry per production deploy. Tokens stripped; sites are public.
 
+## 2026-11-17 - bhres1 + bhwrt24 (bryanhamilton.info)
+- Change: the resume push. bhres1 refreshed the stale tech resume bryan-hamilton-tech.html (frozen at Oct 12): bronze 28->33, +3 repo blocks (preview-media-session, og-card, deploy-log), a "Proof of Work" section linking the receipts ledger + stats.php + four engineering write-ups, ProfilePage JSON-LD, sitemap lastmod, IndexNow, receipts row. bhwrt24 published article #27 "Three Bugs in a Trenchcoat" - the favorites sync saga (capture-phase click hijack, missing CSRF meta + silent .catch 403, two sources of truth, add-only tombstone-aware merge) - via the full 9-surface publish: on-server template clone, hub card + count 26->27 + BlogPosting entry, homepage card before the CURRENT top card, llms.txt + ai.txt mirror, sitemap, rss, og-manifest, IndexNow
+- Risk: the article rehearsal caught the prose splice consuming the <article class="prose"> opening tag itself - the exact "lost prose wrapper" bug from the Nov 14 saga. Fix: splice INSIDE the wrapper (tagEnd = strpos('>')+1). Also: a missing worker and a wrong token render the IDENTICAL custom 404, so "doesn't work" needed a state probe before a diagnosis - the first run simply never landed on the host
+- Verify: resume carries 33 bronze + proof section + JSON-LD live; article 200 with h1 x1 / prose x1 / zero template residue, og.php renders the card PNG, hub at 27 articles, home card absolute href, llms at all 27, sitemap/rss/manifest patched, receipts row live
+- Tag: `.bak-bhwrt24.bak` x7 (kept pending eyeball); bhres1 self-cleaned
+
 ## 2026-11-17 - bhmedias1 + bhart1 + bheqv5 + bhclfix1 (bryanhamilton.info)
 - Change: EQ dock player day - bhmedias1 wired Media Session metadata into bh-eq.js (title/artist/album + 600x600 art on play, cleared on stop); bhart1 added the 40px album-art thumbnail to the dock (200x200 source, clears on stop, reduced-motion safe); bhclfix1 purged the CL proxy cache (60-min stale scrape was serving bronze 32) and synced the static chip; bheqv5 bumped the loader refs the first two workers missed
 - Risk: the version-bump passes swept the HTML files - but the bh-eq.js ref actually lives inside rack.js, so patched content shipped behind a stale ?v=3 ref and cached browsers would have kept the old player forever. Rule: find where an asset is REFERENCED on the live site, not where you assume it is. bheqv5 fixed it (bh-eq.js v3->v5 in rack.js, rack.js v46->v47 in HTML)
