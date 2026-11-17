@@ -2,6 +2,37 @@
 
 One entry per production deploy. Tokens stripped; sites are public.
 
+## 2026-11-17 - djcmedias1 + bhclprobe1 (thedjcalendar.com / bryanhamilton.info)
+- Change: Media Session metadata for the search hover player - title, artist and 600x600 artwork land in navigator.mediaSession.metadata on play, cleared on stop, so Apple's media popover shows the track instead of the page title; shp v8->v9 across 11 root templates. Read-only probe on BH dumped bh-cl-live.php to diagnose the CL bronze chip showing 32 while the profile says 33
+- Risk: needles cut from the browser-rendered page never matched disk - the browser decodes &middot; entities, so the raw bytes differ. All needles re-cut from raw served bytes fetched in-page through the JS challenge. The CL ghost was the proxy's own 60-min cache serving a pre-badge scrape: the scraper was right all along
+- Verify: served shp v9 carries the marker; the exact served patch block executed in a real browser against an iTunes-shaped track returned title/artist/art; endpoint cache purged for a fresh scrape
+- Tag: `.bak-medias1.bak` (self-cleaned); probe self-deleted
+
+## 2026-11-16 - favorites + hover-player saga (thedjcalendar.com)
+- Change: favorites finally sync end-to-end - three stacked bugs: a legacy capture-handler hijacking heart clicks, a missing CSRF meta silently 403-ing the account save, and SAVE never reverse-syncing; app-main.js v40. New djcMergeFavs() pulls starredDJs + server favorites into the legacy FAVORITES section (add-only, tombstone-aware) at load + 1.2s retry
+- Risk: the silent .catch plus a local-merge fallback masked the dead POST for weeks - hearts lit and the UI echoed success while the server never heard anything. Verify server state, never the UI echo
+- Verify: hearts <-> /account sync both directions, tombstones survive reload; Bryan-confirmed
+
+## 2026-11-16 - djchover1-8 + djctickhover1 + djcshpback1 (thedjcalendar.com)
+- Change: hover player shipped - hovering a search result or NEXT UP ticker name plays that artist's top iTunes preview in a right-side panel: 250ms hover-intent, no restart on child hovers, dismiss via click-outside, ESC and Backspace (key+keyCode 8); genre.php duplicate template chunk handled; /search-hover-player.js standalone, tagged after app-main.js
+- Risk: eight workers to get it right - dead worker files djchover1-8.php left on the host pending cleanup; the stickySearchRow gate initially bypassed ticker items until .djc-hero-item selectors joined the shp match set
+- Verify: playback, all dismissal paths and dock hover production-checked; shp glob bumped every pass
+
+## 2026-11-16 - djcslugfix2+3 + djcintro1 + follow + predcards (thedjcalendar.com)
+- Change: 59 mangled city slugs corrected with canonical matching + 301 redirects (a city 404 now just means no djs.json shows); 647 artist intros filled; follow alerts shipped (/follow-btn.js via header.php, append-only into the existing alert_subscribers pipeline); prediction share cards with og:image on /tour-predictions/ (RANK badge default ON, conf pill removed, fonts 24/34/17/15)
+- Risk: slug "fixes" that re-derive slugs from names mangle non-ASCII - match canonical slugs from the existing data instead
+- Verify: city pages resolve, intros render, follow button feeds the pipeline, cards "look perfect" per Bryan
+
+## 2026-11-16 - timeline + receipts expansion (bryanhamilton.info)
+- Change: /timeline/ shipped (73 nodes, full SAGA, og.php?a=timeline); /receipts/ chip count 45->73; card tilt kept, scramble text effect removed per Bryan; mobile burger drawer staged (bh-mobnav1: touch hover hints, QR hidden, boot-leak fix)
+- Risk: project/page counts live in page text, JSON-LD, llms.txt and ai.txt - a count change that syncs only one surface lies to the crawlers
+- Verify: timeline renders 73 nodes, receipts at 73 rows, SAGA endpoints live
+
+## 2026-11-15 - bhclfix4+5 + bhmed1 + bhart10 + wrt22 (bryanhamilton.info)
+- Change: CL feed rewritten - coderlegion.php scrapes the profile + per-post API with an X-API-Key (firehose pagination throttles the server IP; never revisit); rack.js v44 floors 14 articles/29 reactions; medal dots recomputed gold 1 / silver 3 / bronze 28 riding the .bh-cnt count-ups; homepage articles restructured top-10 + collapsed 16 (12 local + 4 dev.to); article #22 published to /writing/
+- Risk: medal counts must be re-checked against the live CL profile before every patch - the numbers ride the count-up animation, so a stale value animates confidently to the wrong thing
+- Verify: CL feed live at 14/29, chip correct, article live
+
 ## 2026-11-14 - djcsbui0 + djcsbui1 (thedjcalendar.com)
 - Change: prediction-scoreboard UI upgrade. A read-only probe dumped the 13,199-byte source first (never patch what you haven't seen); then a 5-needle worker added: FAQPage JSON-LD (3 questions - grading cadence, hit definition, misses are public), a countdown chip ("FIRST GRADES LAND FEB 1, 2027 - IN N DAYS", PHP-computed, self-retires the moment gradedN > 0), a "The road ahead" month-arc visualization (pending predictions grouped by month, count + avg confidence + opacity-scaled bars, ksort'd Jan 2027 -> Apr 2028), and band-colored confidence pills (vhigh/high/med/low) on all 61 pending rows
 - Risk: rehearsal on a sqlite stand-in (apt php-sqlite3) caught three of MY bugs before the server saw any of them: the patch-marker verify failed because no patch introduced the marker; `$g['conf']` inside a double-quoted PHP string interpolated fatally; and a literal backslash-n inside the injected CSS string killed the `.arc` flex rule silently (computed display stayed block). All fixed pre-handoff; final sim rendered the flex arc, chip (ceil for calendar days), and 12 seeded pills with zero PHP warnings
