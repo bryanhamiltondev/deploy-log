@@ -2,6 +2,36 @@
 
 One entry per production deploy. Tokens stripped; sites are public.
 
+## 2026-11-17 - bhuses1 (bryanhamilton.info)
+- Change: /uses/ shipped - the stack-and-infrastructure page (AEO play: "what does this dev actually run on"). Full SAGA from day one: canonical, OG card via og.php?a=uses (200 image/png), WebPage + Breadcrumb + FAQPage JSON-LD, llms.txt "## Stack" section, ai.txt mirror, sitemap entry, IndexNow ping, receipts row
+- Risk: a new page that ships without its llms/ai.txt mirror splits the site's own corpus - both written in the same pass, never "later"
+- Verify: cache-busted /uses/ live with styling + JSON-LD; og.php renders the PNG; worker self-deleted
+- Tag: `.bak-bhuses1.bak`
+
+## 2026-11-17 - bhproj9 (bryanhamilton.info)
+- Change: 9 per-repo project pages generated at /projects/<slug>/ for the GitHub-hosted repos that had no on-site case study (og-card, lazy-cron, arcade, badge-proxy, browser-direct-feed, led-commit-wall, guarded-deploy-workers, guarded-deploy-worker, one-file-analytics). Names + descriptions parsed from llms.txt with an 8-entry sanity floor; llms/ai.txt GitHub links flipped to the on-site pages; sitemap + IndexNow. Template embedded via nowdoc - single-file worker rule held
+- Risk: the repo ledger was llms.txt, not an API - parsed with a minimum-entry guard so a partial fetch aborts instead of generating 9 stub pages. Slug case caught in review (an /projects/Arcade/ path would have 404'd next to the lowercase convention)
+- Verify: all 9 URLs 200 with SoftwareSourceCode JSON-LD; llms/ai.txt point on-site; worker self-deleted
+- Tag: `.bak-bhproj9.bak`
+
+## 2026-11-17 - bhprint1 (bryanhamilton.info)
+- Change: one-click PDF resume - print stylesheet (bh-print1-css) hides the rack chrome and a JS-created fixed DOWNLOAD PDF button (#bh-printbtn) calls window.print(). The resume now prints clean straight from the browser
+- Risk: v1 failed on the host with the two-file pattern (PHP + separate payload file) - v1's payload never landed and the worker correctly refused. v2 embedded the payload via nowdoc
+- Verify: served resume carries both markers; print preview clean; worker self-deleted
+- Tag: `.bak-bhprint1.bak`
+
+## 2026-11-17 - bhbayops1 (bryanhamilton.info)
+- Change: LED Bay ops block - two status LEDs (BH = this host, DJC = fed browser-direct via /top10.php because Cloudflare blocks server-to-server) and a 30-day deploys-per-day sparkline parsed from this very LOG.md on raw.githubusercontent. Marker root #bh-bayops-root, style bh-bayops-css
+- Risk: v1 was also a two-file casualty; v2 embedded. DJC's LED rides the browser-direct fallback chain - a server-side fetch would have been DOA per the Nov 14 Cloudflare block
+- Verify: served homepage carries the marker root, LEDs and spark render; worker self-deleted
+- Tag: `.bak-bhbayops1.bak`
+
+## 2026-11-17 - bhstyle1 (bryanhamilton.info)
+- Change: the 10 new pages from this batch (/uses/ + 9 project pages) rendered unstyled - /style.css targets rack-specific classes bare markup never gets. bhstyle1 embedded the bh-page1-css studio-rack stylesheet into all 10 directly
+- Risk: the batch's rule violation (two-file workers) hit THREE workers before it was caught - sweep every worker in a batch for a rule the turn it breaks, not just the one that failed. Style target list re-checked for slug case before shipping
+- Verify: "to patch: 10, already styled: 0 / OK - 10 files styled"; bh-page1-css confirmed in served raw bytes of /uses/ and /projects/og-card/
+- Tag: `.bak-bhstyle1.bak` x10
+
 ## 2026-11-17 - bhdepfix3 (bryanhamilton.info)
 - Change: the deploys strip finished - entries are 1 column / 2 rows (title line, then full description beneath) with the legacy flex-row overridden via !important, li padding 25px, and the strip now shows only the last 3 deploys with a SHOW ALL N DEPLOYS ghost button underneath that expands the full log. v3 swapped the v2 payload in place, marker-anchored on the block bhdepfix2 itself injected
 - Risk: patching my own injected block meant trusting an earlier worker's output - the swap is needle-counted and auto-restores on verify failure. Also: a self-closing comment marker inside the PHP docblock terminated it early (php -l caught it)
