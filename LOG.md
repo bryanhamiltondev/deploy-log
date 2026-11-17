@@ -2,6 +2,12 @@
 
 One entry per production deploy. Tokens stripped; sites are public.
 
+## 2026-11-17 - bhdepfix2 (bryanhamilton.info)
+- Change: the "Recent deploys" strip under the LED Bay restyled - each entry now renders title-first ("date · workers · site" in cyan mono) with the full Change description underneath in subdued gray, instead of one crushed line. v1 failed on the host: a two-file worker (PHP + separate .block payload) silently injected 0 bytes when the payload file never landed - the verify-marker refused success and the byte-identical write did no harm. v2 embedded the payload in the PHP via nowdoc; renders via an additive script before </body> that re-parses LOG.md from raw.githubusercontent, plus a MutationObserver that overwrites the old renderer's mashed output the moment it lands
+- Risk: shipping a worker that reads a second file from the host treats the upload step as reliable - it is not. Single-file workers only; payloads embedded, never referenced
+- Verify: cache-busted live homepage shows title + full desc for every entry, old mashed format gone; worker self-deleted
+- Tag: `.bak-bhdepfix2.bak`
+
 ## 2026-11-17 - bhres1 + bhwrt24 (bryanhamilton.info)
 - Change: the resume push. bhres1 refreshed the stale tech resume bryan-hamilton-tech.html (frozen at Oct 12): bronze 28->33, +3 repo blocks (preview-media-session, og-card, deploy-log), a "Proof of Work" section linking the receipts ledger + stats.php + four engineering write-ups, ProfilePage JSON-LD, sitemap lastmod, IndexNow, receipts row. bhwrt24 published article #27 "Three Bugs in a Trenchcoat" - the favorites sync saga (capture-phase click hijack, missing CSRF meta + silent .catch 403, two sources of truth, add-only tombstone-aware merge) - via the full 9-surface publish: on-server template clone, hub card + count 26->27 + BlogPosting entry, homepage card before the CURRENT top card, llms.txt + ai.txt mirror, sitemap, rss, og-manifest, IndexNow
 - Risk: the article rehearsal caught the prose splice consuming the <article class="prose"> opening tag itself - the exact "lost prose wrapper" bug from the Nov 14 saga. Fix: splice INSIDE the wrapper (tagEnd = strpos('>')+1). Also: a missing worker and a wrong token render the IDENTICAL custom 404, so "doesn't work" needed a state probe before a diagnosis - the first run simply never landed on the host
