@@ -2,6 +2,18 @@
 
 One entry per production deploy. Tokens stripped; sites are public.
 
+## 2026-11-17 - bhdepfix3 (bryanhamilton.info)
+- Change: the deploys strip finished - entries are 1 column / 2 rows (title line, then full description beneath) with the legacy flex-row overridden via !important, li padding 25px, and the strip now shows only the last 3 deploys with a SHOW ALL N DEPLOYS ghost button underneath that expands the full log. v3 swapped the v2 payload in place, marker-anchored on the block bhdepfix2 itself injected
+- Risk: patching my own injected block meant trusting an earlier worker's output - the swap is needle-counted and auto-restores on verify failure. Also: a self-closing comment marker inside the PHP docblock terminated it early (php -l caught it)
+- Verify: live page shows 2-row entries at 25px padding, last 3 + expand button, SHOW ALL renders all 33 entries
+- Tag: `.bak-bhdepfix3.bak`
+
+## 2026-11-17 - bhartcap1 (bryanhamilton.info)
+- Change: homepage article list capped back to 10 visible - the cap had drifted to 11 (Scheduled Jobs With Zero Crontab was the 11th). The card was structurally cut (href-anchored <a>..</a> walk - formatting-proof, no raw-source fetch needed behind the LiteSpeed challenge) and re-inserted as the first card in the articles expander; summary updated to "Show 17 more: 13 articles + 4 cross-posts" and "+ 14 more deep-dives"
+- Risk: needle patches against browser-DOM-derived markup - avoided entirely by cutting on structure (slug -> strrpos '<a class="card"' -> strpos '</a>'), which survives any whitespace/attribute difference between disk and rendered DOM
+- Verify: live page shows exactly 10 visible cards, Scheduled Jobs intact as first hidden card, counts honest; homepage now surfaces all 27 /writing/ articles (10 + 13 local + 4 dev.to cross-posts)
+- Tag: `.bak-bhartcap1.bak`
+
 ## 2026-11-17 - bhdepfix2 (bryanhamilton.info)
 - Change: the "Recent deploys" strip under the LED Bay restyled - each entry now renders title-first ("date · workers · site" in cyan mono) with the full Change description underneath in subdued gray, instead of one crushed line. v1 failed on the host: a two-file worker (PHP + separate .block payload) silently injected 0 bytes when the payload file never landed - the verify-marker refused success and the byte-identical write did no harm. v2 embedded the payload in the PHP via nowdoc; renders via an additive script before </body> that re-parses LOG.md from raw.githubusercontent, plus a MutationObserver that overwrites the old renderer's mashed output the moment it lands
 - Risk: shipping a worker that reads a second file from the host treats the upload step as reliable - it is not. Single-file workers only; payloads embedded, never referenced
