@@ -1,3 +1,9 @@
+## 2026-11-17 - bhsaga1 (bryanhamilton.info)
+- Change: full-site SAGA audit (61 sitemap pages) found 4 pages missing from llms.txt/ai.txt (case-studies, hiring, now.html, changelog.html) plus 73-byte ai.txt drift from bhuses1's old-format line; bhsaga1 inserted the 4 entries, resynced ai.txt to a byte-copy of llms.txt, and cleaned /receipts/ - removed 2 of 3 adjacent "Deploy strip v2" duplicate rows and corrected the chip 73 -> 89 (rows - 2 dups + 1 new row, computed from the actual row count, not hardcoded)
+- Risk: the re-audit's one remaining flag is a false positive - the jsonld-schema-audit page's own demo JS contains the literal ld+json script string, which a regex audit catches; the real schema parses. Do not "fix"
+- Verify: live llms.txt carries all 4 entries, ai.txt byte-identical to llms.txt (13,373 B), /receipts/ at 89 rows with chip 89 and a single "Deploy strip v2", IndexNow 200, worker self-deleted; re-audit 60/61 clean
+- Tag: `.bak-bhsaga1.bak` x3 (self-cleaned)
+
 # Deploy Log
 
 One entry per production deploy. Tokens stripped; sites are public.
@@ -24,7 +30,7 @@ One entry per production deploy. Tokens stripped; sites are public.
 - Change: LED Bay ops block - two status LEDs (BH = this host, DJC = fed browser-direct via /top10.php because Cloudflare blocks server-to-server) and a 30-day deploys-per-day sparkline parsed from this very LOG.md on raw.githubusercontent. Marker root #bh-bayops-root, style bh-bayops-css
 - Risk: v1 was also a two-file casualty; v2 embedded. DJC's LED rides the browser-direct fallback chain - a server-side fetch would have been DOA per the Nov 14 Cloudflare block
 - Verify: served homepage carries the marker root, LEDs and spark render; worker self-deleted
-- Tag: `.bak-bhbayops1.bak`
+- Tag: `.bak-bhbaysops1.bak`
 
 ## 2026-11-17 - bhstyle1 (bryanhamilton.info)
 - Change: the 10 new pages from this batch (/uses/ + 9 project pages) rendered unstyled - /style.css targets rack-specific classes bare markup never gets. bhstyle1 embedded the bh-page1-css studio-rack stylesheet into all 10 directly
