@@ -2,6 +2,12 @@
 
 One entry per production deploy. Tokens stripped; sites are public.
 
+## 2026-11-17 - bhmedias1 + bhart1 + bheqv5 + bhclfix1 (bryanhamilton.info)
+- Change: EQ dock player day - bhmedias1 wired Media Session metadata into bh-eq.js (title/artist/album + 600x600 art on play, cleared on stop); bhart1 added the 40px album-art thumbnail to the dock (200x200 source, clears on stop, reduced-motion safe); bhclfix1 purged the CL proxy cache (60-min stale scrape was serving bronze 32) and synced the static chip; bheqv5 bumped the loader refs the first two workers missed
+- Risk: the version-bump passes swept the HTML files - but the bh-eq.js ref actually lives inside rack.js, so patched content shipped behind a stale ?v=3 ref and cached browsers would have kept the old player forever. Rule: find where an asset is REFERENCED on the live site, not where you assume it is. bheqv5 fixed it (bh-eq.js v3->v5 in rack.js, rack.js v46->v47 in HTML)
+- Verify: served bh-eq.js carries bh-medias-v1 + bh-eqart-set; served rack.js refs v5; bh-cl-live.php returns gold 1 / silver 5 / bronze 33; homepage aria-label matches. All four workers self-deleted
+- Tag: `.bak-eqv5.bak` (self-cleaned); baks from medias1/art1/clfix1 self-cleaned
+
 ## 2026-11-17 - djcmedias1 + bhclprobe1 (thedjcalendar.com / bryanhamilton.info)
 - Change: Media Session metadata for the search hover player - title, artist and 600x600 artwork land in navigator.mediaSession.metadata on play, cleared on stop, so Apple's media popover shows the track instead of the page title; shp v8->v9 across 11 root templates. Read-only probe on BH dumped bh-cl-live.php to diagnose the CL bronze chip showing 32 while the profile says 33
 - Risk: needles cut from the browser-rendered page never matched disk - the browser decodes &middot; entities, so the raw bytes differ. All needles re-cut from raw served bytes fetched in-page through the JS challenge. The CL ghost was the proxy's own 60-min cache serving a pre-badge scrape: the scraper was right all along
