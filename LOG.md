@@ -30,7 +30,7 @@ One entry per production deploy. Tokens stripped; sites are public.
 - Change: LED Bay ops block - two status LEDs (BH = this host, DJC = fed browser-direct via /top10.php because Cloudflare blocks server-to-server) and a 30-day deploys-per-day sparkline parsed from this very LOG.md on raw.githubusercontent. Marker root #bh-bayops-root, style bh-bayops-css
 - Risk: v1 was also a two-file casualty; v2 embedded. DJC's LED rides the browser-direct fallback chain - a server-side fetch would have been DOA per the Nov 14 Cloudflare block
 - Verify: served homepage carries the marker root, LEDs and spark render; worker self-deleted
-- Tag: `.bak-bhbaysops1.bak`
+- Tag: `.bak-bhbayops1.bak`
 
 ## 2026-11-17 - bhstyle1 (bryanhamilton.info)
 - Change: the 10 new pages from this batch (/uses/ + 9 project pages) rendered unstyled - /style.css targets rack-specific classes bare markup never gets. bhstyle1 embedded the bh-page1-css studio-rack stylesheet into all 10 directly
