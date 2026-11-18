@@ -1,3 +1,15 @@
+## 2026-11-17 - bhpms1 (bryanhamilton.info)
+- Change: repo #19 preview-media-session got its on-site page at /projects/preview-media-session/ - the Nov 17 repo shipped with a social preview but zero on-site presence while the "22 open-source repos" claims already counted it (20 project pages + deploy-log + this one = 22, so the count promised a page that 404'd). House template clone from the og-card page: SoftwareSourceCode JSON-LD, og.php?a=preview-media-session card, canonical, FAQ block, llms/ai.txt +1 entry (ai.txt resynced as byte-copy), sitemap URL, IndexNow, receipts row + chip recompute
+- Risk: the count claims were RIGHT and the page was wrong - an audit that only cross-checks claim-vs-claim passes this; the missing surface hid behind a count that already included it
+- Verify: live page 200 (7,125 B) with styling + JSON-LD, llms/ai byte-identical at 13,585 B with the entry, sitemap +1, og.php 200 image/png, receipts chip 91, IndexNow 200, worker self-deleted
+- Tag: `.bak-pms1.bak` x3 (self-cleaned)
+
+## 2026-11-17 - bhclb34 (bryanhamilton.info)
+- Change: Coder Legion bronze hit 34 - static chip surfaces synced: homepage aria-label, bronze medal tooltip title, bronze count-up static (data-to), plus a stale silver count-up static (data-to 3 vs the aria-label's 5), and the resume's "33 bronze badges". The live endpoint bh-cl-live.php already scraped 34 and the count-ups self-correct on load, but crawlers and no-JS visitors see statics. Receipts row + chip recompute
+- Risk: the live-fetch block updates count-ups and the aria-label but NOT the medal title tooltip - statics drift invisibly whenever a surface never passes through the fetch updater
+- Verify: live homepage aria "1 gold, 5 silver, 34 bronze", cl-num-b data-to 34, resume "34 bronze badges", receipts chip recomputed, IndexNow 200, worker self-deleted
+- Tag: `.bak-clb34.bak` x3 (self-cleaned)
+
 ## 2026-11-17 - bhsaga1 (bryanhamilton.info)
 - Change: full-site SAGA audit (61 sitemap pages) found 4 pages missing from llms.txt/ai.txt (case-studies, hiring, now.html, changelog.html) plus 73-byte ai.txt drift from bhuses1's old-format line; bhsaga1 inserted the 4 entries, resynced ai.txt to a byte-copy of llms.txt, and cleaned /receipts/ - removed 2 of 3 adjacent "Deploy strip v2" duplicate rows and corrected the chip 73 -> 89 (rows - 2 dups + 1 new row, computed from the actual row count, not hardcoded)
 - Risk: the re-audit's one remaining flag is a false positive - the jsonld-schema-audit page's own demo JS contains the literal ld+json script string, which a regex audit catches; the real schema parses. Do not "fix"
