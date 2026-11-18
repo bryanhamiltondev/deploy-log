@@ -1,3 +1,9 @@
+## 2026-11-17 - bhbayled1 (bryanhamilton.info)
+- Change: LED Commit Bay trimmed to one LED - the DJC status dot removed entirely per Bryan, and the BH dot made statically green. The old BH status did a HEAD request to /style.css and LiteSpeed can reject HEADs while serving the page fine, so the LED sat amber on a healthy site. New logic: if the page is rendering, the site is up - the dot is green, no fetch
+- Risk: a status indicator that fetches to prove the page it is running on is up can only ever say "down" wrongly, never "up" wrongly - self-referential checks belong static
+- Verify: cache-busted live homepage: zero bhs-djc residue, BH-only LED row with static green class, receipts chip 92 + row, IndexNow 200, worker self-deleted. Remaining top10.php reference is the hero chip's data fallback (bhhchip2), not the LED
+- Tag: `.bak-bayled1.bak` (self-cleaned)
+
 ## 2026-11-17 - bhpms1 (bryanhamilton.info)
 - Change: repo #19 preview-media-session got its on-site page at /projects/preview-media-session/ - the Nov 17 repo shipped with a social preview but zero on-site presence while the "22 open-source repos" claims already counted it (20 project pages + deploy-log + this one = 22, so the count promised a page that 404'd). House template clone from the og-card page: SoftwareSourceCode JSON-LD, og.php?a=preview-media-session card, canonical, FAQ block, llms/ai.txt +1 entry (ai.txt resynced as byte-copy), sitemap URL, IndexNow, receipts row + chip recompute
 - Risk: the count claims were RIGHT and the page was wrong - an audit that only cross-checks claim-vs-claim passes this; the missing surface hid behind a count that already included it
