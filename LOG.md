@@ -1,3 +1,9 @@
+## 2026-11-19 - bhwdsn1 (bryanhamilton.info)
+- Change: stray literal \n (2 bytes of backslash-n TEXT, not a newline) sat between the <!-- wdtreetrend/wdtrend0-wd --> comment marker and </body> on /web-developer/ - wdtrend0 residue, the classic literal-backslash-n injection bug. One needle: "-->\n</body>" -> "-->" + real newline + "</body>" (31,728 -> 31,727). Same pass: receipts self-log row (newest-first insert) + hero recount in the same worker, so the hero we just synced to 100/100 did not instantly drift: now 101/101
+- Risk: the self-log note itself contained "</body>" - which would have injected raw markup into the receipts HTML. Caught in rehearsal: notes must describe markup in prose, never quote it
+- Verify: cache-busted live: zero literal backslash-n in the served page, tail is comment -> newline -> </body>, served 31,727 B, hero "101 changes shipped / 101 live-verified", receipts carries the BHWDSN1 row, worker 404
+- Tag: none (backup self-cleaned)
+
 ## 2026-11-19 - bhhstat1 (bryanhamilton.info)
 - Change: web-developer hero stat synced to the real receipts ledger - the hero sat at 94/94 while /receipts/ moved to 100 rows (the wrt28 + receipts-reorder self-log rows landed after bhhero1's snapshot). bhhstat1 reads the LIVE row count at run time (count of class="v" verified cells = 100) and writes that, never a remembered number: hero now "100 changes shipped / 100 live-verified". Dry run read 100 and printed the plan without writing; GO wrote web-developer/index.html (31,726 -> 31,728 B), backup cleaned, self-deleted
 - Risk: the same drift can recur - the fix pattern is "count at run time", but nothing re-syncs the hero automatically when receipts grows again. If it drifts again, the right move is making the hero read the count server-side (like the chip recompute), not another sync worker
