@@ -184,7 +184,7 @@ One entry per production deploy. Tokens stripped; sites are public.
 - Tag: `.bak-djcsbui1.bak` (self-cleaned)
 
 ## 2026-11-14 - bhrack18 (bryanhamilton.info)
-- Change: repo #18 browser-direct-feed published (fc6b96b) + rack card #17 inside the expander ("Show 9 more projects" -> "Show 10 more projects"); counts 17->18 across 15 needles (copy, FAQ x3, "published..." lines x3, meta list, JSON-LD numberOfItems + ListItem 17, llms/ai.txt +1 entry each). Rack columns now even at 18
+- Change: repo #18 browser-direct-feed published (fc6b96b) + rack card #17 inside the expander ("Show 9 more projects" -> "Show 10 more projects"); counts 17->18 across 15 needles (copy, FAQ x3, "published..." lines x3, meta list, units readout, boot line, JSON-LD numberOfItems + ListItem 17, llms/ai.txt +1 entry each). Rack columns now even at 18
 - Risk: the JSON-LD ItemList runs 17 repo entries under numberOfItems 18 BY DESIGN - the rack's the-dj-calendar site card is a product, not SoftwareSourceCode, so it is excluded. Do not "fix" this mismatch
 - Verify: 20/20 cache-busted checks PASS (card idx 17, zero 17-count stragglers, JSON-LD parses, position 17 = browser-direct-feed, llms/ai synced); worker self-deleted, baks cleaned
 - Tag: `.bak-bhrack18.bak` (self-cleaned)
