@@ -235,7 +235,8 @@ One entry per production deploy. Tokens stripped; sites are public.
 - Verify: timeline renders 73 nodes, receipts at 73 rows, SAGA endpoints live
 
 ## 2026-11-15 - bhclfix4+5 + bhmed1 + bhart10 + wrt22 (bryanhamilton.info)
-- Change: CL feed rewritten - coderlegion.php scrapes the profile + per-post API with an X-API-Key (firehose pagination throttles the server IP; never revisit); rack.js v44 floors 14 articles/29 reactions; medal dots recomputed gold 1 / silver 3 / bronze 28 riding the .bh-cnt count-up animation, so a stale value animates confidently to the wrong thing
+- Change: CL feed rewritten - coderlegion.php scrapes the profile + per-post API with an X-API-Key (firehose pagination throttles the server IP; never revisit); rack.js v44 floors 14 articles/29 reactions; medal dots recomputed gold 1 / silver 3 / bronze 28 riding the .bh-cnt count-ups; homepage articles restructured top-10 + collapsed 16 (12 local + 4 dev.to); article #22 published to /writing/
+- Risk: medal counts must be re-checked against the live CL profile before every patch - the numbers ride the count-up animation, so a stale value animates confidently to the wrong thing
 - Verify: CL feed live at 14/29, chip correct, article live
 
 ## 2026-11-14 - djcsbui0 + djcsbui1 (thedjcalendar.com)
@@ -344,7 +345,6 @@ One entry per production deploy. Tokens stripped; sites are public.
 - Change: hero live chip counts up via new same-origin proxy `bh-live-data.php` (10-min cache; source JSON has no CORS headers), flame badge links to Coder Legion post, footer order swapped
 - Risk: fetching cross-origin JSON client-side dies silently - server-side proxy was the fix, not a CORS flag we don't control
 - Verify: served HTML 306,953 bytes (was 302,704), chip centered
-- Tag: `.bak-bhhsexy*.bak`
 
 ## 2026-11-11 - bhwrt17 (bryanhamilton.info)
 - Change: tour-alerts article backfilled to /writing/ with full SAGA (canonical, JSON-LD, llms.txt entry, sitemap, IndexNow)
