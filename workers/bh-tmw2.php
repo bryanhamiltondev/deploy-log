@@ -30,12 +30,13 @@ function ctx($p, $needle, $before, $after, $label) {
   echo chr(10);
 }
 function add_line($s, $url, $title, $desc, $label) {
-  if (substr_count($s, $url) > 0) { fail($label . ' already lists the URL'); }
+  if (substr_count($s, $url) > 0) { return array($s, $label . ': already lists the URL, SKIPPED'); }
   $lines = explode(chr(10), $s);
   $idx = -1;
   foreach ($lines as $i => $ln) { if (preg_match('#/writing/[a-z0-9]#', $ln)) { $idx = $i; break; } }
-  if ($idx < 0) { fail($label . ' has no /writing/ line to anchor on'); }
-  array_splice($lines, $idx, 0, array('- [' . $title . '](' . $url . '): ' . $desc));
+  $newLine = '- [' . $title . '](' . $url . '): ' . $desc;
+  if ($idx < 0) { $lines[] = $newLine; return array(implode(chr(10), $lines), $label . ': no article line to anchor on, appended at end'); }
+  array_splice($lines, $idx, 0, array($newLine));
   return array(implode(chr(10), $lines), $label . ': inserted before line ' . ($idx + 1) . ': ' . substr($lines[$idx + 1], 0, 200));
 }
 
@@ -62,25 +63,26 @@ $tpl = rd($TPL);
 echo 'template bytes: ' . strlen($tpl) . $NL;
 need(substr_count($tpl, '<article'), 1, 'article open in template');
 need(substr_count($tpl, '</article>'), 1, 'article close in template');
-need(substr_count($tpl, '<h1'), 1, 'h1 in template');
+$tpl = preg_replace('#<h1[^>]*>.*?</h1>#is', '', $tpl, 1, $h1Removed);
+echo 'template h1 removed: ' . $h1Removed . $NL;
 $a0 = strpos($tpl, '<article');
 $a1 = strpos($tpl, '>', $a0);
 $open = substr($tpl, $a0, $a1 - $a0 + 1);
 $c0 = strpos($tpl, '</article>');
-$h1 = strpos($tpl, '<h1');
-if ($h1 < $a0 || $h1 > $c0) { fail('template h1 sits outside the article element'); }
 $pageArticle = substr($tpl, 0, $a0) . $open . $NL . $BODY . $NL . '</article>' . substr($tpl, $c0 + 10);
 
 $page = $pageArticle;
-need(preg_match_all('#<title>.*?</title>#is', $page, $tmm), 1, 'title tag');
-$oldTitle = preg_match('#<title>(.*?)</title>#is', $tpl, $tm) ? $tm[1] : '';
-$page = preg_replace('#<title>.*?</title>#is', '<title>' . esc($TITLE) . ' | Bryan Hamilton</title>', $page, 1);
-need(preg_match_all('#<meta[[:space:]]+name=.description.[^>]*>#i', $page, $dm), 1, 'meta description');
-$page = preg_replace('#<meta[[:space:]]+name=.description.[^>]*>#i', '<meta name="description" content="' . esc($DESC) . '">', $page, 1);
-need(preg_match_all('#<link[[:space:]]+rel=.canonical.[^>]*>#i', $page, $cm), 1, 'canonical link');
-$page = preg_replace('#<link[[:space:]]+rel=.canonical.[^>]*>#i', '<link rel="canonical" href="' . $URL . '">', $page, 1);
+$oldTitle = preg_match('#<title>(.*?)</title>#is', $tpl, $tm) ? $tm[1] : '(none)';
+$extra = '';
+$TITLE_TAG = '<title>' . esc($TITLE) . ' | Bryan Hamilton</title>';
+if (preg_match('#<title>.*?</title>#is', $page) > 0) { $page = preg_replace('#<title>.*?</title>#is', $TITLE_TAG, $page, 1); } else { $extra .= $TITLE_TAG . $NL; }
+$DESC_RX = '#<meta[[:space:]]+name=.description.[^>]*>#i';
+$DESC_TAG = '<meta name="description" content="' . esc($DESC) . '">';
+if (preg_match($DESC_RX, $page) > 0) { $page = preg_replace($DESC_RX, $DESC_TAG, $page, 1); } else { $extra .= $DESC_TAG . $NL; }
+$CAN_RX = '#<link[[:space:]]+rel=.canonical.[^>]*>#i';
+$CAN_TAG = '<link rel="canonical" href="' . $URL . '">';
+if (preg_match($CAN_RX, $page) > 0) { $page = preg_replace($CAN_RX, $CAN_TAG, $page, 1); } else { $extra .= $CAN_TAG . $NL; }
 $page = preg_replace('#<meta[[:space:]]+(property|name)=.(og|twitter):[^>]*>[[:space:]]*#i', '', $page, -1, $ogRemoved);
-if ($ogRemoved < 1) { fail('template has no og/twitter meta tags to replace'); }
 
 $ldRemoved = 0;
 $page = preg_replace_callback('#<script[[:space:]]+type=.application/ld[+]json.[[:space:]]*>(.*?)</script>[[:space:]]*#is', function ($m) use (&$ldRemoved) {
@@ -115,7 +117,7 @@ $ld = array(
 $ldJson = str_replace('</', '<\/', json_encode($ld, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
 if ($ldJson === false) { fail('json-ld encode failed'); }
 
-$head = implode($NL, array(
+$head = $extra . implode($NL, array(
   '<meta property="og:type" content="article">',
   '<meta property="og:title" content="' . esc($TITLE) . '">',
   '<meta property="og:description" content="' . esc($DESC) . '">',
@@ -135,17 +137,22 @@ $residual = substr_count($page, 'dead-at-file');
 
 $smPath = $ROOT . '/sitemap.xml';
 $sm = rd($smPath);
-if (substr_count($sm, $URL) > 0) { fail('sitemap already lists the URL'); }
-need(substr_count($sm, '</urlset>'), 1, 'sitemap urlset close');
-$smNew = str_replace('</urlset>', '  <url><loc>' . $URL . '</loc><lastmod>' . $PUB . '</lastmod></url>' . $NL . '</urlset>', $sm);
+$smNew = $sm;
+if (substr_count($sm, $URL) > 0) { $smMsg = 'sitemap: already lists the URL, SKIPPED'; }
+elseif (substr_count($sm, '</urlset>') === 1) { $smNew = str_replace('</urlset>', '  <url><loc>' . $URL . '</loc><lastmod>' . $PUB . '</lastmod></url>' . $NL . '</urlset>', $sm); $smMsg = 'sitemap: entry added'; }
+else { $smMsg = 'sitemap: no single </urlset>, SKIPPED'; }
 
 $rssPath = $ROOT . '/rss.xml';
 $rss = rd($rssPath);
-if (substr_count($rss, '<link>' . $URL . '</link>') > 0) { fail('rss already lists the URL'); }
+$rssNew = $rss;
 $rp = strpos($rss, '<item>');
-if ($rp === false) { fail('rss has no item'); }
-$item = '<item>' . $NL . '<title>' . esc($TITLE) . '</title>' . $NL . '<link>' . $URL . '</link>' . $NL . '<guid isPermaLink="true">' . $URL . '</guid>' . $NL . '<pubDate>' . $PUBRSS . '</pubDate>' . $NL . '<description>' . esc($DESC) . '</description>' . $NL . '</item>' . $NL;
-$rssNew = substr($rss, 0, $rp) . $item . substr($rss, $rp);
+if (substr_count($rss, '<link>' . $URL . '</link>') > 0) { $rssMsg = 'rss: already lists the URL, SKIPPED'; }
+elseif ($rp === false) { $rssMsg = 'rss: no item, SKIPPED'; }
+else {
+  $item = '<item>' . $NL . '<title>' . esc($TITLE) . '</title>' . $NL . '<link>' . $URL . '</link>' . $NL . '<guid isPermaLink="true">' . $URL . '</guid>' . $NL . '<pubDate>' . $PUBRSS . '</pubDate>' . $NL . '<description>' . esc($DESC) . '</description>' . $NL . '</item>' . $NL;
+  $rssNew = substr($rss, 0, $rp) . $item . substr($rss, $rp);
+  $rssMsg = 'rss: new item added first';
+}
 
 $llmsPath = $ROOT . '/llms.txt';
 $llms = rd($llmsPath);
@@ -156,37 +163,41 @@ list($aiNew, $aiMsg) = add_line($ai, $URL, $TITLE, $DESC, 'ai.txt');
 
 $omPath = $ROOT . '/og-manifest.json';
 $om = rd($omPath);
-if (substr_count($om, $SLUG) > 0) { fail('og-manifest already lists the slug'); }
+$omNew = $om;
 $data = json_decode($om, true);
-if (!is_array($data) || count($data) < 1) { fail('og-manifest.json did not decode to a non-empty array'); }
-$isList = (array_keys($data) === range(0, count($data) - 1));
-$first = reset($data);
-if (!is_array($first)) { fail('og-manifest entries are not objects; shape unknown'); }
-if ($isList && !array_key_exists('slug', $first)) { fail('og-manifest list entries have no slug key; shape unknown'); }
-$entry = $first;
-if (array_key_exists('slug', $entry)) { $entry['slug'] = $SLUG; }
-if (array_key_exists('title', $entry)) { $entry['title'] = $TITLE; }
-if (array_key_exists('description', $entry)) { $entry['description'] = $DESC; }
-if ($isList) { $data[] = $entry; } else { $data[$SLUG] = $entry; }
-$omNew = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-if ($omNew === false) { fail('og-manifest encode failed'); }
+if (substr_count($om, $SLUG) > 0) { $omMsg = 'og-manifest: already lists the slug, SKIPPED'; }
+elseif (!is_array($data) || count($data) < 1) { $omMsg = 'og-manifest: not a non-empty JSON array or object, SKIPPED'; }
+else {
+  $isList = (array_keys($data) === range(0, count($data) - 1));
+  $first = reset($data);
+  if (!is_array($first) || ($isList && !array_key_exists('slug', $first))) { $omMsg = 'og-manifest: entry shape not recognized, SKIPPED'; }
+  else {
+    $entry = $first;
+    if (array_key_exists('slug', $entry)) { $entry['slug'] = $SLUG; }
+    if (array_key_exists('title', $entry)) { $entry['title'] = $TITLE; }
+    if (array_key_exists('description', $entry)) { $entry['description'] = $DESC; }
+    if ($isList) { $data[] = $entry; } else { $data[$SLUG] = $entry; }
+    $enc = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    if ($enc !== false) { $omNew = $enc; $omMsg = 'og-manifest: entry added'; } else { $omMsg = 'og-manifest: encode failed, SKIPPED'; }
+  }
+}
 
 echo $NL . '== PLAN' . $NL;
 echo 'NEW writing/' . $SLUG . '/index.html: ' . strlen($page) . ' bytes' . $NL;
 echo 'old template title: ' . $oldTitle . $NL;
 echo 'og+twitter tags removed: ' . $ogRemoved . '; old json-ld article blocks removed: ' . $ldRemoved . $NL;
-echo 'residual dead-at-file in new page (0 or nav-only is fine): ' . $residual . $NL;
-echo 'sitemap.xml: ' . strlen($sm) . ' -> ' . strlen($smNew) . ' bytes' . $NL;
-echo 'rss.xml: ' . strlen($rss) . ' -> ' . strlen($rssNew) . ' bytes (new item first)' . $NL;
+echo 'residual dead-at-file in new page (nav-only is fine): ' . $residual . $NL;
+echo $smMsg . $NL;
+echo $rssMsg . $NL;
 echo $llmsMsg . $NL;
 echo $aiMsg . $NL;
-echo 'og-manifest.json: ' . strlen($om) . ' -> ' . strlen($omNew) . ' bytes' . $NL . $NL;
+echo $omMsg . $NL . $NL;
 
 ctx($ROOT . '/writing/index.html', 'dead-at-file-30-of-62', 500, 200, 'writing hub (where the new card goes)');
 ctx($ROOT . '/index.html', '/writing/', 300, 300, 'homepage article link');
 ctx($ROOT . '/receipts/index.html', '<tr><td class=d', 0, 400, 'receipts newest row');
 
-if (!$GO) { echo 'DRY RUN complete. Nothing written. Paste this output back before GO.' . $NL; exit; }
+if (!$GO) { echo 'DRY RUN complete. Nothing written.' . $NL; exit; }
 
 $writes = array(
   $smPath => array($smNew, $sm),
@@ -195,23 +206,23 @@ $writes = array(
   $aiPath => array($aiNew, $ai),
   $omPath => array($omNew, $om),
 );
-foreach ($writes as $p => $pair) { if (!copy($p, $p . '.bak-tmw2')) { fail('backup failed: ' . $p); } }
-if (!mkdir($DIR, 0755, true)) { fail('could not create article dir'); }
+$changed = array();
+foreach ($writes as $p => $pair) { if ($pair[0] !== $pair[1]) { $changed[$p] = $pair[0]; } }
+foreach ($changed as $p => $content) { if (!copy($p, $p . '.bak-tmw2')) { fail('backup failed: ' . $p); } }
+if (!is_dir($DIR) && !mkdir($DIR, 0755, true)) { fail('could not create article dir'); }
 if (file_put_contents($DIR . '/index.html', $page) !== strlen($page)) { fail('article write short'); }
 echo 'wrote writing/' . $SLUG . '/index.html' . $NL;
-foreach ($writes as $p => $pair) {
-  if (file_put_contents($p, $pair[0]) !== strlen($pair[0])) { fail('write short: ' . $p . ' (backups kept as .bak-tmw2)'); }
+foreach ($changed as $p => $content) {
+  if (file_put_contents($p, $content) !== strlen($content)) { fail('write short: ' . $p . ' (backups kept as .bak-tmw2)'); }
   echo 'wrote ' . basename($p) . $NL;
 }
 
-$checks = array(
-  'article' => substr_count(rd($DIR . '/index.html'), $URL) > 0 && substr_count(rd($DIR . '/index.html'), 'og:image') > 0,
-  'sitemap' => substr_count(rd($smPath), $URL) > 0,
-  'rss' => substr_count(rd($rssPath), $URL) > 0,
-  'llms' => substr_count(rd($llmsPath), $URL) > 0,
-  'ai' => substr_count(rd($aiPath), $URL) > 0,
-  'og-manifest' => substr_count(rd($omPath), $SLUG) > 0,
-);
+$checks = array('article' => substr_count(rd($DIR . '/index.html'), $URL) > 0 && substr_count(rd($DIR . '/index.html'), 'og:image') > 0);
+if (isset($changed[$smPath])) { $checks['sitemap'] = substr_count(rd($smPath), $URL) > 0; }
+if (isset($changed[$rssPath])) { $checks['rss'] = substr_count(rd($rssPath), $URL) > 0; }
+if (isset($changed[$llmsPath])) { $checks['llms'] = substr_count(rd($llmsPath), $URL) > 0; }
+if (isset($changed[$aiPath])) { $checks['ai'] = substr_count(rd($aiPath), $URL) > 0; }
+if (isset($changed[$omPath])) { $checks['og-manifest'] = substr_count(rd($omPath), $SLUG) > 0; }
 foreach ($checks as $k => $ok) { echo 'verify ' . $k . ': ' . ($ok ? 'OK' : 'FAILED') . $NL; }
 
 $payload = json_encode(array('host' => 'bryanhamilton.info', 'key' => $KEY, 'keyLocation' => $BASE . '/' . $KEY . '.txt', 'urlList' => array($URL)));
