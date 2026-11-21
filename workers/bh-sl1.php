@@ -19,9 +19,10 @@ $nH = substr_count($html, 'Career timeline');
 $nL = substr_count($html, 'See the build timeline');
 echo "needle 'Career timeline' count: $nH (need 1)\n";
 echo "needle 'See the build timeline' count: $nL (need 1)\n";
-if ($nH !== 1 || $nL !== 1) { echo "ABORT: needle count mismatch; nothing written\n"; exit; }
-$h = strpos($html, 'Career timeline');
+if ($nH < 1 || $nL !== 1) { echo "ABORT: needle count mismatch; nothing written\n"; exit; }
 $p = strpos($html, 'See the build timeline');
+$h = ($p === false) ? false : strrpos(substr($html, 0, $p), 'Career timeline');
+if ($h === false || $p - $h > 9000) { echo "ABORT: no Career timeline heading near the link; nothing written\n"; exit; }
 if ($p <= $h) { echo "ABORT: link appears before heading; nothing written\n"; exit; }
 $seg = substr($html, $h, $p - $h);
 $best = -1; $bestTag = '';
