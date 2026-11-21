@@ -1,3 +1,27 @@
+## 2026-11-20 - Stew Leonard's hire banner (bryanhamilton.info)
+- Change: "Fresh out of the kitchen: Bryan is the new Hoedown chef at Stew Leonard's" fixed banner at the top of the homepage, non-dismissible, cow logo, links to stewleonards.com. Body padding-top 35px so the site shifts down beneath it. Went relative, then sticky, then fixed before the final v4 landed.
+- Risk: a fixed banner without matching body padding covers the header. The nav and corner card needed their own offsets once the banner was fixed.
+- Verify: cache-busted live: banner marker bh-chef4-fix x1, logo 200, body padding 35px, banner copy and stewleonards.com link present.
+- Tag: none (baks pending sweep)
+
+## 2026-11-20 - bhnavfix1 (bryanhamilton.info)
+- Change: stickybar (photo dropdown + Tech/Retail/Book options) moved from top 0 to top 35px so it sits beneath the Stew Leonard's banner when scrolling.
+- Risk: raising z-index would only hide the nav behind the banner; the offset puts it fully below.
+- Verify: cache-busted live: stickybar rule top 35px.
+- Tag: none (baks pending sweep)
+
+## 2026-11-20 - bhcorner1 (bryanhamilton.info)
+- Change: QR .corner card top moved to 70px so it clears the banner and nav. The print rule (top 0) is untouched.
+- Risk: the screen rule was unique; the print stylesheet has its own top 0 that must not change.
+- Verify: cache-busted live: .corner top 70px, print rule top 0 unchanged.
+- Tag: none (baks pending sweep)
+
+## 2026-11-20 - bhjobs1-3 (bryanhamilton.info)
+- Change: Stew Leonard's row added to the career timeline ("2026 - Now", Hoedown chef), on the same line as the other seven jobs. The grid went from 7 to 8 columns.
+- Risk: an 8th item in a 7-column grid wraps onto its own line, so the column count has to change with the row.
+- Verify: cache-busted live: timeline row 8 present, 8-column grid rule live, Stew Leonard's row and 2026 - Now label present.
+- Tag: none (baks pending sweep)
+
 ## 2026-11-19 - bhexpfix1 (bryanhamilton.info)
 - Change: rack expander fixed - the "Show 14 more projects" toggle was dead not because of the button but because bhfx1's drag-reorder restore re-appended EVERY .rack-card into the main grid on load (the saved-order restore loop ran seq.forEach(c => grid.appendChild(c)) over all 21 cards), so anyone who had ever dragged a card had all 21 pulled out of the details expander, leaving it empty. One needle: the restore loop now guards on the card already being in the main grid, so only grid cards re-order and the 14 rolled-up cards stay in the details. rack.js v48->v49 bumped across 65 HTML pages (1 ref each). Node sim on a 21-card DOM with a polluted saved order: OLD 21-in-grid / 0 rolled up, NEW 7 / 14
 - Risk: polluted localStorage orders self-heal - the 21-entry saved order is harmlessly ignored for non-grid cards and the next drag persists 7. Backup kept only on rack.js; the 65 HTML bumps are exact counted 1-char swaps with in-memory rollback and per-file verify
@@ -211,8 +235,7 @@ One entry per production deploy. Tokens stripped; sites are public.
 - Verify: timeline renders 73 nodes, receipts at 73 rows, SAGA endpoints live
 
 ## 2026-11-15 - bhclfix4+5 + bhmed1 + bhart10 + wrt22 (bryanhamilton.info)
-- Change: CL feed rewritten - coderlegion.php scrapes the profile + per-post API with an X-API-Key (firehose pagination throttles the server IP; never revisit); rack.js v44 floors 14 articles/29 reactions; medal dots recomputed gold 1 / silver 3 / bronze 28 riding the .bh-cnt count-ups; homepage articles restructured top-10 + collapsed 16 (12 local + 4 dev.to); article #22 published to /writing/
-- Risk: medal counts must be re-checked against the live CL profile before every patch - the numbers ride the count-up animation, so a stale value animates confidently to the wrong thing
+- Change: CL feed rewritten - coderlegion.php scrapes the profile + per-post API with an X-API-Key (firehose pagination throttles the server IP; never revisit); rack.js v44 floors 14 articles/29 reactions; medal dots recomputed gold 1 / silver 3 / bronze 28 riding the .bh-cnt count-up animation, so a stale value animates confidently to the wrong thing
 - Verify: CL feed live at 14/29, chip correct, article live
 
 ## 2026-11-14 - djcsbui0 + djcsbui1 (thedjcalendar.com)
