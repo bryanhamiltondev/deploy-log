@@ -22,7 +22,7 @@ $p = strpos($src, $mark);
 $startNeedle = "fetch('/coderlegion.php',{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){";
 $endNeedle = '}).catch(function(){});';
 $s0 = strpos($src, $startNeedle, $p);
-if ($s0 === false || ($s0 - $p) > 600) { echo 'ABORT: clsec1 fetch start not found near marker (pos ' . var_export($s0, true) . ')' . $NL; exit; }
+if ($s0 === false || ($s0 - $p) > 1500) { echo 'ABORT: clsec1 fetch start not found near marker (pos ' . var_export($s0, true) . ', delta ' . ($s0 === false ? -1 : $s0 - $p) . ')' . $NL; exit; }
 $e0 = strpos($src, $endNeedle, $s0);
 if ($e0 === false || ($e0 - $s0) > 1600) { echo 'ABORT: clsec1 fetch end not found in range' . $NL; exit; }
 $end = $e0 + strlen($endNeedle);
