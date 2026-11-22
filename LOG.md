@@ -1,3 +1,21 @@
+## 2026-11-22 - bh-clnum2 / bh-clnum2x (bryanhamilton.info)
+- Change: Coder Legion medal statics synced to live truth (1 gold, 9 silver, 44 bronze): bronze tooltip 43->44, .cl-num-b data-to 43->44, .cl-num-s 8->9, aria-label rewritten. Recursive scan over 81 html files, 1 carrier (index.html).
+- Risk: the bh-clive1 runtime block already recounts on page load, so a wrong static would flash then self-correct; the drift risk was only in first-paint and no-JS.
+- Verify: live statics 1/9/44 in served index.html; the original GO landed before this session's debugging saga. Re-run gates kept rejecting the `!` tokens on the host (unexplained), so the x-variant rebuild with an alphanumeric token (bhClnum2x9) was uploaded, self-tested 2/2, dried (1 carrier, nothing to change), GO'd only to self-delete. Superseded token: bh-Clnum2!
+- Tag: none (worker self-deleted; bak-clnum2 backups never created - no writes needed)
+
+## 2026-11-22 - bh-pages1036 (bryanhamilton.info)
+- Change: homepage DJC counter static corrected ~1,090 -> ~1,036 (full-sitemap total: artists 99 + cities 79 + venues 83 + FAQ 762 + genres 13), and bh-djc-count.php rewritten as a sitemap-INDEX crawler (counts every <loc> across all child sitemaps, browser UA, 6h disk cache, stale fallback). Old proxy counted only artists+cities+venues and had dropped the live card to 257.
+- Risk: needle-guarded single match on the index.html span, post-check data-to="1036" x1, backup index.html.bak-p1036 before write, byte-verify after.
+- Verify: live: served index.html span data-to="1036" ~1,036; bh-djc-count.php returns {"total":1048,...} from the crawler. Original GO landed pre-saga; x-variant (bhPgD1036x) uploaded later dried as ABORT: index needle not found - correctly, because the patch was already in. Superseded token: bh-PgD!
+- Tag: none (original worker self-deleted on GO)
+
+## 2026-11-22 - djc-singleplay-v1 (thedjcalendar.com)
+- Change: ticker hover-player orphan fix - leaving a hovered ticker artist fast no longer leaves the previous track playing over the new one; one audio singleton across concurrent hovers. search-hover-player.js +538 B (5 markers), app-main.js +310 B (2 markers), 8 version refs bumped v40->v41 / v9->v10.
+- Risk: DJC click delegation on hearts uses a window-capture handler, so the singleton binds at window level in capture phase and stops propagation before the heart path can double-fire.
+- Verify: tokened dry clean (7 needles, deltas 538/310, balance zero), GO clean with backups (search-hover-player.js.bak-singleplay.bak, app-main.js.bak-singleplay.bak), live markers 5+2 on served JS (full browser headers required: UA + Referer + Sec-Fetch).
+- Token: djc-Sp1Pl4y! (self-deleted)
+
 ## 2026-11-20 - Stew Leonard's hire banner (bryanhamilton.info)
 - Change: "Fresh out of the kitchen: Bryan is the new Hoedown chef at Stew Leonard's" fixed banner at the top of the homepage, non-dismissible, cow logo, links to stewleonards.com. Body padding-top 35px so the site shifts down beneath it. Went relative, then sticky, then fixed before the final v4 landed.
 - Risk: a fixed banner without matching body padding covers the header. The nav and corner card needed their own offsets once the banner was fixed.
