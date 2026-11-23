@@ -1,3 +1,15 @@
+## 2026-11-22 - bh-slm1 (bryanhamilton.info)
+- Change: sitemap.xml lastmod refresh from real file mtimes - every <loc> mapped to its disk file (root dirs -> index.html, flat .html/.php direct, article slugs -> writing/<slug>/index.html); missing files keep their old date. 66 URLs re-dated: twelve Oct-12 stragglers, the Oct-27 homepage and eleven Oct-29 entries replaced. Backward moves kept (filemtime is the truth - /writing/ claimed Nov 9, file says Nov 1). Post-write verify (url count + digit-shape lastmod x66), receipts self-log row, web-developer hero 106->107, IndexNow ping (sitemap + homepage).
+- Risk: fixture dry-run on live bytes caught the /receipts/ entry pre-ship - it carries extra <changefreq>+<priority> tags, so the strict <url> regex aborted on a healthy file (regex loosened for optional tags). The receipts row's note under-counted (48 vs 66), corrected by bh-slm2.
+- Verify: Bryan ran the host GO (report not captured); independent cache-busted live verify: XML valid (66 urls, 66 lastmod), all stale dates gone, sitemap dates match Apache Last-Modified headers on sampled pages, receipts row live, hero 107 changes shipped, worker 404.
+- Token: bhSlmLm4x9 (alphanumeric; worker self-deleted). Worker commit a9a50ab7 (4,512 B; first commit 2866c265 over-escaped the verify regexes + \r\n header and was replaced byte-identically)
+
+## 2026-11-22 - bh-slm2 (bryanhamilton.info)
+- Change: receipts row note corrected in place - "48 URLs re-dated" -> "66 URLs re-dated". Same-row edit, no new row: ledger count and hero stay 107.
+- Risk: needle count 1 or abort; ALREADY FIXED short-circuit; post-write row-count guard (107) with auto-restore; backup self-cleans.
+- Verify: live cache-busted: "66 URLs re-dated" x1, old text 0, 107 rows, worker 404, no .bak left.
+- Token: bhSlm2Fx66 (self-deleted). Worker commit 8a1c0e6a (1,241 B, byte-identical to fixture source)
+
 ## 2026-11-22 - bh-tml1 (bryanhamilton.info)
 - Change: Tomorrowland article completion - the Nov 21 publish shipped the page + RSS + llms/ai + sitemap but missed its discovery surfaces. One worker closed all seven: /writing/ hub card (first more-card) + BlogPosting JSON-LD entry FIRST in the blogPost array + article count 28->29; homepage card at the TOP of the visible list with the bhartcap1 10-visible cap held (the 10th card, dead-at-file-30-of-62, structurally cut via href-anchored <a>..</a> walk and re-inserted in the expander before lazy-cron, keeping newest-first order) + expander summary "Show 19 more: 15 articles + 4 cross-posts" / "+ 15 more deep-dives"; og-manifest entry as first "p" key (json_decode-validated); receipts row inserted before the first data-row anchor + chip 105->106; web-developer hero recounted 106/106; IndexNow 200 (article + /writing/ + homepage)
 - Risk: the fixture dry-run on real served bytes caught the move-needle bug pre-ship: the dead-at-file card uses a RELATIVE href (/writing/...) while the newer cards are absolute - the initial absolute-URL needle would have aborted on the host. Also: sandbox PHP lacked the curl extension, which proved the worker's unguarded IndexNow call could FATAL after all writes but before self-delete, stranding the worker on the host - function_exists('curl_init') guard added. og-manifest is the only JSON surface: decode-validated before GO, not just string-checked
@@ -73,7 +85,7 @@ RESTORE NOTE (also Nov 19): the first attempt at this entry passed ONLY the entr
 - Tag: none (backup self-cleaned)
 
 ## 2026-11-19 - bhwdsn1 (bryanhamilton.info)
-- Change: stray literal \n (2 bytes of backslash-n TEXT, not a newline) sat between the <!-- wdtreetrend/wdtrend0-wd --> comment marker and </body> on /web-developer/ - wdtrend0 residue, the classic literal-backslash-n injection bug. One needle: "-->\n</body>" -> "-->" + real newline + "</body>" (31,728 -> 31,727). Same pass: receipts self-log row (newest-first insert) + hero recount in the same worker, so the hero we just synced to 100/100 did not instantly drift: now 101/101
+- Change: stray literal \n (2 bytes of backslash-n TEXT, not a newline) sat between the <!-- wdtreetrend/wdtrend0-wd --> comment marker and </body> on /web-developer/ - wdtrend0 residue, the classic literal-backslash-n injection bug. One needle: "-->&#10;</body>" -> "-->" + real newline + "</body>" (31,728 -> 31,727). Same pass: receipts self-log row (newest-first insert) + hero recount in the same worker, so the hero we just synced to 100/100 did not instantly drift: now 101/101
 - Risk: the self-log note itself contained "</body>" - which would have injected raw markup into the receipts HTML. Caught in rehearsal: notes must describe markup in prose, never quote it
 - Verify: cache-busted live: zero literal backslash-n in the served page, tail is comment -> newline -> </body>, served 31,727 B, hero "101 changes shipped / 101 live-verified", receipts carries the BHWDSN1 row, worker 404
 - Tag: none (backup self-cleaned)
@@ -186,7 +198,7 @@ One entry per production deploy. Tokens stripped; sites are public.
 
 ## 2026-11-17 - bhprint1 (bryanhamilton.info)
 - Change: one-click PDF resume - print stylesheet (bh-print1-css) hides the rack chrome and a JS-created fixed DOWNLOAD PDF button (#bh-printbtn) calls window.print(). The resume now prints clean straight from the browser
-- Risk: v1 failed on the host with the two-file pattern (PHP + separate payload file) - v1's payload never landed and the worker correctly refused. v2 embedded the payload via nowdoc
+- Risk: v1 failed on the host with the two-file pattern (PHP + separate payload file) - v1's payload never landed and the worker correctly refused. v2 embedded the payload in the PHP via nowdoc
 - Verify: served resume carries both markers; print preview clean; worker self-deleted
 - Tag: `.bak-bhprint1.bak`
 
