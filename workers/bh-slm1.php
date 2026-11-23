@@ -39,9 +39,9 @@ if ($DRY) { echo 'DRY - nothing written'; exit; }
 
 file_put_contents($sm, $out);
 $chk = file_get_contents($sm);
-preg_match_all('/<lastmod>([^<]+)<\\/lastmod>/', $chk, $V);
+preg_match_all('/<lastmod>([^<]+)<\/lastmod>/', $chk, $V);
 $ok = (count($V[1]) === count($M)) && (substr_count($chk, '<loc>') === count($M));
-foreach ($V[1] as $d) { if (!preg_match('/^\\d{4}-\\d{2}-\\d{2}$/', $d)) { $ok = false; } }
+foreach ($V[1] as $d) { if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $d)) { $ok = false; } }
 if (!$ok) { copy($sm . '.bak-slm1.bak', $sm); echo 'VERIFY FAIL - RESTORED'; exit; }
 echo 'SITEMAP OK' . "\n";
 
@@ -75,7 +75,8 @@ if (is_file($wf)) {
 
 // IndexNow ping (non-fatal)
 $payload = json_encode(array('host' => 'bryanhamilton.info', 'key' => 'ec61cb24045482a3a8b4621740fad3bb', 'urlList' => array('https://bryanhamilton.info/sitemap.xml', 'https://bryanhamilton.info/')));
-$ctx = stream_context_create(array('http' => array('method' => 'POST', 'header' => "Content-Type: application/json; charset=utf-8\\r\\n", 'content' => $payload, 'timeout' => 10)));
+$ctx = stream_context_create(array('http' => array('method' => 'POST', 'header' => "Content-Type: application/json; charset=utf-8
+", 'content' => $payload, 'timeout' => 10)));
 $resp = @file_get_contents('https://api.indexnow.org/indexnow', false, $ctx);
 echo 'IndexNow: ' . ($resp !== false ? 'HTTP 200/2xx' : 'ping failed (non-fatal)') . "\n";
 
