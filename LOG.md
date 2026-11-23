@@ -85,7 +85,7 @@ RESTORE NOTE (also Nov 19): the first attempt at this entry passed ONLY the entr
 - Tag: none (backup self-cleaned)
 
 ## 2026-11-19 - bhwdsn1 (bryanhamilton.info)
-- Change: stray literal \n (2 bytes of backslash-n TEXT, not a newline) sat between the <!-- wdtreetrend/wdtrend0-wd --> comment marker and </body> on /web-developer/ - wdtrend0 residue, the classic literal-backslash-n injection bug. One needle: "-->&#10;</body>" -> "-->" + real newline + "</body>" (31,728 -> 31,727). Same pass: receipts self-log row (newest-first insert) + hero recount in the same worker, so the hero we just synced to 100/100 did not instantly drift: now 101/101
+- Change: stray literal \n (2 bytes of backslash-n TEXT, not a newline) sat between the <!-- wdtreetrend/wdtrend0-wd --> comment marker and </body> on /web-developer/ - wdtrend0 residue, the classic literal-backslash-n injection bug. One needle: "-->\n</body>" -> "-->" + real newline + "</body>" (31,728 -> 31,727). Same pass: receipts self-log row (newest-first insert) + hero recount in the same worker, so the hero we just synced to 100/100 did not instantly drift: now 101/101
 - Risk: the self-log note itself contained "</body>" - which would have injected raw markup into the receipts HTML. Caught in rehearsal: notes must describe markup in prose, never quote it
 - Verify: cache-busted live: zero literal backslash-n in the served page, tail is comment -> newline -> </body>, served 31,727 B, hero "101 changes shipped / 101 live-verified", receipts carries the BHWDSN1 row, worker 404
 - Tag: none (backup self-cleaned)
@@ -198,7 +198,7 @@ One entry per production deploy. Tokens stripped; sites are public.
 
 ## 2026-11-17 - bhprint1 (bryanhamilton.info)
 - Change: one-click PDF resume - print stylesheet (bh-print1-css) hides the rack chrome and a JS-created fixed DOWNLOAD PDF button (#bh-printbtn) calls window.print(). The resume now prints clean straight from the browser
-- Risk: v1 failed on the host with the two-file pattern (PHP + separate payload file) - v1's payload never landed and the worker correctly refused. v2 embedded the payload in the PHP via nowdoc
+- Risk: v1 failed on the host with the two-file pattern (PHP + separate payload file) - v1's payload never landed and the worker correctly refused. v2 embedded the payload via nowdoc
 - Verify: served resume carries both markers; print preview clean; worker self-deleted
 - Tag: `.bak-bhprint1.bak`
 
